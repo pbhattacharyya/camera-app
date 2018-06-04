@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Camera app</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+		<link rel="stylesheet" href="main.css" />
+
+		<!-- heading & body font-->
+		<link href="https://fonts.googleapis.com/css?family=Cardo|Montserrat" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans|Yeseva+One" rel="stylesheet">
+    </head>
+    <body>
+
+            <video autoplay playsinline></video>
+
+            <script>
+              (function() {
+                'use strict';
+                var video = document.querySelector('video'),
+                 canvas;
+            
+                /**
+                 *  generates a still frame image from the stream in the <video>
+                 *  appends the image to the <body>
+                 */
+                function takeSnapshot() {
+                  var img = document.querySelector('img') || document.createElement('img');
+                  var context;
+                  var width = video.offsetWidth
+                    , height = video.offsetHeight;
+            
+                  canvas = canvas || document.createElement('canvas');
+                  canvas.width = width;
+                  canvas.height = height;
+            
+                  context = canvas.getContext('2d');
+                  context.drawImage(video, 0, 0, width, height);
+            
+                  img.src = canvas.toDataURL('image/png');
+                  document.body.appendChild(img);
+                }
+            
+                // use MediaDevices API
+                // docs: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+                if (navigator.mediaDevices) {
+                  // access the web cam
+                  navigator.mediaDevices.getUserMedia({video: { width: 720, height: 720, facingMode: "environment" } })
+                  // permission granted:
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                      video.addEventListener('click', takeSnapshot);
+                    })
+                    // permission denied:
+                    .catch(function(error) {
+                      document.body.textContent = 'Could not access the camera. Error: ' + error.name;
+                    });
+                }
+
+
+                /* // Older browsers might not implement mediaDevices at all, so we set an empty object first
+                          if (navigator.mediaDevices === undefined) {
+                            navigator.mediaDevices = {};
+                          }
+
+                          // Some browsers partially implement mediaDevices. We can't just assign an object
+                          // with getUserMedia as it would overwrite existing properties.
+                          // Here, we will just add the getUserMedia property if it's missing.
+                          if (navigator.mediaDevices.getUserMedia === undefined) {
+                            navigator.mediaDevices.getUserMedia = function(constraints) {
+
+                              // First get ahold of the legacy getUserMedia, if present
+                              var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                              // Some browsers just don't implement it - return a rejected promise with an error
+                              // to keep a consistent interface
+                              if (!getUserMedia) {
+                                return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                              }
+
+                              // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+                              return new Promise(function(resolve, reject) {
+                                getUserMedia.call(navigator, constraints, resolve, reject);
+                              });
+                            }
+                          }
+
+                          navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+                          .then(function(stream) {
+                            var video = document.querySelector('video');
+                            // Older browsers may not have srcObject
+                            if ("srcObject" in video) {
+                              video.srcObject = stream;
+                            } else {
+                              // Avoid using this in new browsers, as it is going away.
+                              video.src = window.URL.createObjectURL(stream);
+                            }
+                            video.onloadedmetadata = function(e) {
+                              video.play();
+                            };
+                          })
+                          .catch(function(err) {
+                            console.log(err.name + ": " + err.message);
+                          }); */
+              })();
+            </script>
+<!--             <script src="main.js"></script>
+ -->	</body>
+</html>
